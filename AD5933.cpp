@@ -498,43 +498,12 @@ bool AD5933::frequencySweep(int real[], int imag[], int n) {
 
         // Increment the frequency and our index.
         i++;
+        //delay(500);
         setControlMode(CTRL_INCREMENT_FREQ);
     }
 
     // Put into standby
     return setPowerMode(POWER_STANDBY);
-}
-
-/**
- * Computes the gain factor and phase for each point in a frequency sweep.
- *
- * @param gain An array of appropriate size to hold the gain factors
- * @param phase An array of appropriate size to hold phase data.
- * @param ref The known reference resistance.
- * @param n Length of the array (or the number of discrete measurements)
- * @return Success or failure
- */
-bool AD5933::phase_calibrate(double gain[], double phase[], int ref, int n) {
-    // We need arrays to hold the real and imaginary values temporarily
-    int *real = new int[n];
-    int *imag = new int[n];
-
-    // Perform the frequency sweep
-    if (!frequencySweep(real, imag, n)) {
-        delete [] real;
-        delete [] imag;
-        return false;
-    }
-
-    // For each point in the sweep, calculate the gain factor and phase
-    for (int i = 0; i < n; i++) {
-        gain[i] = (double)(1.0/ref)/sqrt(pow(real[i], 2) + pow(imag[i], 2));
-        phase[i] = (double)atan(imag[i] / real[i]);
-    }
-
-    delete [] real;
-    delete [] imag;
-    return true;
 }
 
 /**
@@ -561,7 +530,18 @@ bool AD5933::calibrate(double gain[], double phase[], int ref, int n) {
     // For each point in the sweep, calculate the gain factor and phase
     for (int i = 0; i < n; i++) {
         gain[i] = (double)(1.0/ref)/sqrt(pow(real[i], 2) + pow(imag[i], 2));
-        phase[i] = (double)atan(imag[i] / real[i]);
+        //phase[i] = (double)atan2((double)imag[i]/(double)real[i]);
+	phase[i] = (double)atan2((double)imag[i], (double)real[i]);
+
+/*if ((real[i] > 0) && (imag[i] > 0)) {
+    phase[i] = (phase[i] * 180) / 3.141592654;
+  } else if ((real[i] > 0) && (imag[i] < 0)) {
+    phase[i] = (phase[i] * 180)/ 3.141592654 + 360;
+  } else if ((real[i] < 0) && (imag[i] < 0)) {  
+    phase[i] = (phase[i] * 180) / 3.141592654+180;
+  } else if ((real[i] < 0) && (imag[i] > 0)) {  
+    phase[i] = (phase[i] * 180) / 3.141592654+180;
+  }*/
     }
 
     delete [] real;
@@ -591,7 +571,21 @@ bool AD5933::calibrate(double gain[], double phase[], int real[], int imag[],
     // For each point in the sweep, calculate the gain factor and phase
     for (int i = 0; i < n; i++) {
         gain[i] = (double)(1.0/ref)/sqrt(pow(real[i], 2) + pow(imag[i], 2));
-        phase[i] = (double)atan(imag[i] / real[i]);
+        //phase[i] = (double)atan2((double)imag[i]/(double)real[i]);
+	phase[i] = (double)atan2((double)imag[i], (double)real[i]);    
+
+/*if ((real[i] > 0) && (imag[i] > 0)) {
+    phase[i] = (phase[i] * 180) / 3.141592654;
+  } else if ((real[i] > 0) && (imag[i] < 0)) {
+    phase[i] = (phase[i] * 180)/ 3.141592654 + 360;
+  } else if ((real[i] < 0) && (imag[i] < 0)) {  
+    phase[i] = (phase[i] * 180) / 3.141592654+180;
+  } else if ((real[i] < 0) && (imag[i] > 0)) {  
+    phase[i] = (phase[i] * 180) / 3.141592654+180;
+  }*/
+
+
+// TODO: phase
     }
 
     return true;
